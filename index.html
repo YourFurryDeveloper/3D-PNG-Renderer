@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>CSS 3D Demos</title>
+    </head>
+
+    <style>
+        html {
+            font-family: Helvetica;
+            background-color: black;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #demoControls {
+            z-index: 100;
+            position: fixed;
+            top: 0px;
+            right: 30px;
+            width: 350px;
+            height: 150px;
+            border-radius: 5px;
+        }
+
+        .controlCombo {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            width: 100%;
+            height: 19px;
+            background-color: #1a1a1ae2;
+            padding: 5px;
+            border-bottom: 1px solid #2c2c2c;
+            border-left: 3px solid #2FA1D6;
+        }
+
+        .controlLabel {
+            font-size: 12px;
+            margin: 0px;
+            margin-right: 10px;
+            color: white;
+        }
+
+        .controlInput {
+            flex: 1;
+            outline: none;
+            border: 1px solid black;
+            border-radius: 5px;
+            padding: 3px;
+            height: 15px;
+            background-color: #303030;
+            color: #2FA1D6;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .numberControl {
+            flex: none;
+            width: 55px !important;
+            margin-left: 5px;
+        }
+
+
+        #image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            perspective: 4500px;
+            transform-style: preserve-3d;
+            transform: rotateX(-9deg);
+        }
+
+        .img-layer {
+            width: 300px;
+            position: absolute;
+        }
+    </style>
+
+    <body>
+        <div id="demoControls">
+            <div class="controlCombo">
+                <p class="controlLabel">Image URL</p>
+                <input type="text" class="controlInput" id="imageUrlInput">
+            </div>
+
+            <div class="controlCombo">
+                <p class="controlLabel">Image Depth</p>
+                <input type="range" max="300" value="10" class="controlInput" id="imgDepthInput">
+                <input type="number" class="controlInput numberControl" id="imgDepthNumInput">
+            </div>
+
+            <div class="controlCombo">
+                <p class="controlLabel">BG Color</p>
+                <input style="height: 20px;" type="color" class="controlInput" id="bgColorInput">
+            </div>
+
+            <div class="controlCombo">
+                <p class="controlLabel">Turn Speed</p>
+                <input type="range" max="30" value="10" class="controlInput" id="turnSpeedInput">
+                <input type="number" class="controlInput numberControl" id="turnSpeedNumInput">
+            </div>
+
+            <div class="controlCombo">
+                <p class="controlLabel">X & Z Rotation (deg)</p>
+                <input style="width: 100%;" type="number" class="controlInput" id="rotXInput">
+                <input style="margin-left: 5px; width: 100%;" type="number" class="controlInput" id="rotZInput">
+            </div>
+        </div>
+
+        <div id="image">
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/7/Stats.js" integrity="sha512-+nNqDCQd6FiN/mQKnpfI/UswnfuG/cjHZbv+amV/2PLiuGgN8+D5dKzR4PqnSY5pZBExGavZz+FdjIeI9WgpKQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='https://mrdoob.github.io/stats.js/build/stats.min.js';document.head.appendChild(script);
+
+            let depth = 100;
+            let imgSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Audacity_Logo.svg/1200px-Audacity_Logo.svg.png";
+            let turnSpeed = 10;
+            
+            let rotX = -20;
+            let rotZ = 0;
+
+            document.getElementById("turnSpeedInput").value = turnSpeed;
+            document.getElementById("turnSpeedNumInput").value = turnSpeed;
+            document.getElementById("imgDepthInput").value = depth;
+            document.getElementById("imgDepthNumInput").value = depth;
+            document.getElementById("bgColorInput").value = "black";
+            document.getElementById("rotXInput").value = rotX;
+            document.getElementById("rotZInput").value = rotZ;
+
+            function drawModel() {
+                document.getElementById("image").innerHTML = "";
+
+                for (let curD = 0; curD < depth; curD++) {
+                    let newImgLayer = document.createElement("img");
+                    newImgLayer.className = "img-layer";
+                    newImgLayer.src = imgSrc;
+                    newImgLayer.style.transform = `translateZ(${curD}px)`;
+                    document.getElementById("image").appendChild(newImgLayer);
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                let rotation = 0;
+                console.log("loaded! :3");
+                drawModel();
+
+                setInterval(function() {
+                    rotation += turnSpeed / 10.5;
+                    document.getElementById("image").style.transform = `rotateX(${rotX}deg) rotateY(${rotation}deg) rotateZ(${rotZ}deg)`;
+                }, 10);
+            })
+
+            document.getElementById("imageUrlInput").addEventListener("input", function() {
+                imgSrc = document.getElementById("imageUrlInput").value;
+                drawModel();
+            })
+
+            document.getElementById("bgColorInput").addEventListener("input", function() {
+                document.body.style.backgroundColor = document.getElementById("bgColorInput").value;
+            })
+
+            document.getElementById("turnSpeedInput").addEventListener("input", function() {
+                document.getElementById("turnSpeedNumInput").value = document.getElementById("turnSpeedInput").value;
+                turnSpeed = document.getElementById("turnSpeedInput").value;
+            })
+
+            document.getElementById("turnSpeedNumInput").addEventListener("input", function() {
+                document.getElementById("turnSpeedInput").value = document.getElementById("turnSpeedNumInput").value;
+                turnSpeed = document.getElementById("turnSpeedNumInput").value;
+            })
+
+            document.getElementById("imgDepthInput").addEventListener("input", function() {
+                document.getElementById("imgDepthNumInput").value = document.getElementById("imgDepthInput").value;
+                depth = document.getElementById("imgDepthInput").value;
+
+                drawModel();
+            })
+
+            document.getElementById("imgDepthNumInput").addEventListener("input", function() {
+                document.getElementById("imgDepthInput").value = document.getElementById("imgDepthNumInput").value;
+                depth = document.getElementById("imgDepthNumInput").value;
+
+                drawModel();
+            })
+
+            document.getElementById("rotXInput").addEventListener("input", function() {
+                rotX = document.getElementById("rotXInput").value;
+            })
+
+            document.getElementById("rotZInput").addEventListener("input", function() {
+                rotZ = document.getElementById("rotZInput").value;
+            })
+        </script>
+    </body>
+</html>
